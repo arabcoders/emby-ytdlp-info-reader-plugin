@@ -1,0 +1,50 @@
+name: Code commit tests
+
+on:
+  workflow_call:
+  push:
+    branches:
+      - "*"
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "**.cs"
+      - "**.csproj"
+
+env:
+  DOTNET_VERSION: "6.0.x"
+
+jobs:
+  test_build:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: restore cached dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+        continue-on-error: false

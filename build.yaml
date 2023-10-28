@@ -1,0 +1,13 @@
+---
+name: "yt-dlp Info Reader"
+guid: "83b77e24-9fce-4ee0-a794-73fdfa972e64"
+version: "1.0.0.5"
+targetAbi: "10.7.0.0"
+owner: "arabcoders"
+overview: "Read yt-dlp and compatiable INFO json metadata files."
+description: "This plugin add support for reading info.json files generated using yt-dlp and compatiable tools for metadata."
+category: "Metadata"
+artifacts:
+  - "YTINFOReader.dll"
+changelog: >
+  changelog
