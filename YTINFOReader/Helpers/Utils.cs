@@ -193,17 +193,17 @@ namespace YTINFOReader.Helpers
             result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyy"));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
 
-            // If the json data has epoch, do not bother calling file data.
+            // use file data if available
+            if (json.file_path != null)
+            {
+                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.file_path.LastWriteTimeUtc.ToString("hhmm"));
+            }
+
+            // else fallback to epoch if available.
             if (json.epoch != null)
             {
                 result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + DateTimeOffset.FromUnixTimeSeconds(json.epoch ?? new long()).ToString("hhmm"));
                 return result;
-            }
-
-            // if no json.epoch is found fallback to file last modification time.
-            if (json.file_path != null)
-            {
-                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.file_path.LastWriteTimeUtc.ToString("hhmm"));
             }
 
             return result;
