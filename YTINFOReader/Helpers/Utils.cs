@@ -12,11 +12,15 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using MediaBrowser.Model.Logging;
 
 namespace YTINFOReader.Helpers
 {
     public class Utils
     {
+#nullable enable
+        public static ILogger? Logger { get; set; }
+#nullable disable
         public static bool IsFresh(FileSystemMetadata fileInfo)
         {
             if (fileInfo.Exists && DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc.UtcDateTime).Days <= 10)
@@ -196,14 +200,22 @@ namespace YTINFOReader.Helpers
             // use file data if available
             if (json.file_path != null)
             {
+                Logger?.Debug($"Using file last write time for episode index number for {json.id} {json.title}.");
                 result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.file_path.LastWriteTimeUtc.ToString("hhmm"));
+                return result;
             }
 
             // else fallback to epoch if available.
             if (json.epoch != null)
             {
+                Logger?.Debug($"Using epoch for episode index number for {json.id} {json.title}.");
                 result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + DateTimeOffset.FromUnixTimeSeconds(json.epoch ?? new long()).ToString("hhmm"));
                 return result;
+            }
+
+            if (json.file_path == null && json.epoch == null)
+            {
+                Logger?.Error($"No file or epoch data found for {json.id} {json.title}.");
             }
 
             return result;

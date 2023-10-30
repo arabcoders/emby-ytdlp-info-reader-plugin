@@ -17,6 +17,7 @@ namespace YTINFOReader.Provider
         public LocalSeasonProvider(ILogger logger)
         {
             _logger = logger;
+            Utils.Logger = logger;
         }
         public Task<MetadataResult<Season>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
