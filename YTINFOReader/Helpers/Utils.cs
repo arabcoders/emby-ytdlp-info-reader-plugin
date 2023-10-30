@@ -197,20 +197,16 @@ namespace YTINFOReader.Helpers
             result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyy"));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
 
-            // use file data if available
-            if (json.file_path != null)
-            {
-                Logger?.Debug($"Using file last write time for episode index number for {json.id} {json.title}.");
-                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.file_path.LastWriteTimeUtc.ToString("hhmm"));
-                return result;
-            }
-
-            // else fallback to epoch if available.
             if (json.epoch != null)
             {
                 Logger?.Debug($"Using epoch for episode index number for {json.id} {json.title}.");
-                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + DateTimeOffset.FromUnixTimeSeconds(json.epoch ?? new long()).ToString("hhmm"));
-                return result;
+                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + DateTimeOffset.FromUnixTimeSeconds(json.epoch ?? new long()).ToString("HHmm"));
+            }
+
+            if (json.epoch == null && json.file_path != null)
+            {
+                Logger?.Debug($"Using file last write time for episode index number for {json.id} {json.title}.");
+                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.file_path.LastWriteTimeUtc.ToString("HHmm"));
             }
 
             if (json.file_path == null && json.epoch == null)
