@@ -24,6 +24,7 @@ namespace YTINFOReader.Provider
         {
             _fileSystem = fileSystem;
             _logger = logger;
+            Utils.Logger = logger;
         }
 
         protected FileSystemMetadata GetInfoJson(string path)

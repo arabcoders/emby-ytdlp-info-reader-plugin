@@ -24,6 +24,7 @@ namespace YTINFOReader.Provider
         {
             _fileSystem = fileSystem;
             _logger = logger;
+            Utils.Logger = logger;
         }
         public bool Supports(BaseItem item) => item is Movie || item is Episode || item is MusicVideo;
 

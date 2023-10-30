@@ -3,7 +3,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<OutputType>Library</OutputType>
 		<RootNamespace>YTINFOReader</RootNamespace>
-		<Version>1.0.0.7</Version>
+		<Version>1.0.0.8</Version>
 		<FileVersion>$(Version)</FileVersion>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
