@@ -30,7 +30,7 @@ namespace YTINFOReader.Provider
 
         private string GetSeriesInfo(string path)
         {
-            _logger.Debug("YTLocalImage GetSeriesInfo: {Path}", path);
+            _logger.Debug($"YTLocalImage GetSeriesInfo: {path}");
             Matcher matcher = new Matcher();
             Regex rx = new Regex(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             matcher.AddInclude("*.jpg");
@@ -45,7 +45,7 @@ namespace YTINFOReader.Provider
                     break;
                 }
             }
-            _logger.Debug("YTLocalImage GetSeriesInfo Result: {InfoPath}", infoPath);
+            _logger.Debug($"YTLocalImage GetSeriesInfo Result: {infoPath}");
             return infoPath;
         }
         /// <summary>
@@ -56,10 +56,10 @@ namespace YTINFOReader.Provider
         /// <returns></returns>
         public IEnumerable<LocalImageInfo> GetImages(BaseItem item, IDirectoryService directoryService)
         {
-            _logger.Debug("YTLocalImage GetImages: {Name}", item.Name);
+            _logger.Debug($"YTLocalImage GetImages: {item.Name}");
             var list = new List<LocalImageInfo>();
             string jpgPath = GetSeriesInfo(item.ContainingFolderPath);
-            if (String.IsNullOrEmpty(jpgPath))
+            if (string.IsNullOrEmpty(jpgPath))
             {
                 return list;
             }

@@ -29,11 +29,11 @@ namespace YTINFOReader.Provider
 
         private string GetSeriesInfo(string path)
         {
-            _logger.Debug("YTLocalSeries GetSeriesInfo: {Path}", path);
-            Matcher matcher = new Matcher();
+            _logger.Debug($"YTLocalSeries GetSeriesInfo: {path}");
+            Matcher matcher = new();
             matcher.AddInclude("**/*.info.json");
-            Regex rxc = new Regex(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            Regex rxp = new Regex(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Regex rxc = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Regex rxp = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             string infoPath = "";
             foreach (string file in matcher.GetResultsInFullPath(path))
             {
@@ -43,14 +43,14 @@ namespace YTINFOReader.Provider
                     break;
                 }
             }
-            _logger.Debug("YTLocalSeries GetSeriesInfo Result: {InfoPath}", infoPath);
+            _logger.Debug($"YTLocalSeries GetSeriesInfo Result: {infoPath}");
             return infoPath;
         }
 
         public Task<MetadataResult<Series>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
-            _logger.Debug("YTLocalSeries GetMetadata: {Path}", info.Path);
-            MetadataResult<Series> result = new MetadataResult<Series>();
+            _logger.Debug($"YTLocalSeries GetMetadata: {info.Path}");
+            MetadataResult<Series> result = new();
             string infoPath = GetSeriesInfo(info.Path);
             if (string.IsNullOrEmpty(infoPath))
             {
@@ -58,7 +58,7 @@ namespace YTINFOReader.Provider
             }
             var infoJson = Utils.ReadYTDLInfo(infoPath, directoryService.GetFile(info.Path), cancellationToken);
             result = Utils.YTDLJsonToSeries(infoJson);
-            _logger.Debug("YTLocalSeries GetMetadata Result: {Result}", result);
+            _logger.Debug($"YTLocalSeries GetMetadata Result: {result}");
             return Task.FromResult(result);
         }
 
@@ -74,7 +74,7 @@ namespace YTINFOReader.Provider
 
         public bool HasChanged(BaseItem item, LibraryOptions LibraryOptions, IDirectoryService directoryService)
         {
-            _logger.Debug("YTLocalSeries HasChanged: {Path}", item.Path);
+            _logger.Debug($"YTLocalSeries HasChanged: {item.Path}");
             var infoPath = GetSeriesInfo(item.Path);
             var result = false;
             if (!string.IsNullOrEmpty(infoPath))
@@ -82,7 +82,7 @@ namespace YTINFOReader.Provider
                 var infoJson = GetInfoJson(infoPath);
                 result = infoJson.Exists && _fileSystem.GetLastWriteTimeUtc(infoJson) < item.DateLastSaved;
             }
-            _logger.Debug("YTLocalSeries HasChanged Result: {Result}", result);
+            _logger.Debug($"YTLocalSeries HasChanged Result: {result}");
             return result;
 
         }

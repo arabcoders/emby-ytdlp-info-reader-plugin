@@ -27,13 +27,13 @@ namespace YTINFOReader.Provider
 
         private string GetSeriesInfo(string path)
         {
-            _logger.Debug("YTLocalImageSeries GetSeriesInfo: {Path}", path);
-            Matcher matcher = new Matcher();
+            _logger.Debug($"YTLocalImageSeries GetSeriesInfo: {path}");
+            Matcher matcher = new();
             matcher.AddInclude("**/*.jpg");
             matcher.AddInclude("**/*.png");
             matcher.AddInclude("**/*.webp");
-            Regex rxc = new Regex(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            Regex rxp = new Regex(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Regex rxc = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Regex rxp = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             string infoPath = "";
             foreach (string file in matcher.GetResultsInFullPath(path))
             {
@@ -43,7 +43,7 @@ namespace YTINFOReader.Provider
                     break;
                 }
             }
-            _logger.Debug("YTLocalImageSeries GetSeriesInfo Result: {InfoPath}", infoPath);
+            _logger.Debug($"YTLocalImageSeries GetSeriesInfo Result: {infoPath}");
             return infoPath;
         }
 
@@ -55,10 +55,10 @@ namespace YTINFOReader.Provider
         /// <returns></returns>
         public IEnumerable<LocalImageInfo> GetImages(BaseItem item, IDirectoryService directoryService)
         {
-            _logger.Debug("YTLocalImageSeries GetImages: {Name}", item.Name);
+            _logger.Debug($"YTLocalImageSeries GetImages: {item.Name}");
             var list = new List<LocalImageInfo>();
             string jpgPath = GetSeriesInfo(item.Path);
-            if (String.IsNullOrEmpty(jpgPath))
+            if (string.IsNullOrEmpty(jpgPath))
             {
                 return list;
             }
@@ -66,7 +66,7 @@ namespace YTINFOReader.Provider
             var fileInfo = _fileSystem.GetFileSystemInfo(jpgPath);
             localimg.FileInfo = fileInfo;
             list.Add(localimg);
-            _logger.Debug("YTLocalImageSeries GetImages Result: {Result}", list.ToString());
+            _logger.Debug($"YTLocalImageSeries GetImages Result: {list}");
             return list;
         }
 

@@ -21,6 +21,19 @@ namespace YTINFOReader.Helpers
 #nullable enable
         public static ILogger? Logger { get; set; }
 #nullable disable
+        /// <summary>
+        /// Regex for matching channel id.
+        /// </summary>
+        private static readonly Regex rxc = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        /// <summary>
+        /// Regex for matching playlist id.
+        /// </summary>
+        private static readonly Regex rxp = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        /// <summary>
+        /// Regex for matching video id.
+        /// </summary>
+        private static readonly Regex rx = new(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         public static bool IsFresh(FileSystemMetadata fileInfo)
         {
             if (fileInfo.Exists && DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc.UtcDateTime).Days <= 10)
@@ -37,27 +50,29 @@ namespace YTINFOReader.Helpers
         /// <returns></returns>
         public static string GetYTID(string name)
         {
-            var rxc = new Regex(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rxc.IsMatch(name))
             {
                 MatchCollection match = rxc.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
 
-            var rxp = new Regex(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rxp.IsMatch(name))
             {
                 MatchCollection match = rxp.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
 
-            var rx = new Regex(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rx.IsMatch(name))
             {
                 MatchCollection match = rx.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
             return "";
+        }
+
+        public static bool IsYouTubeContent(string name)
+        {
+            return GetYTID(name) != "";
         }
 
         /// <summary>
@@ -235,7 +250,6 @@ namespace YTINFOReader.Helpers
             result.Item.Name = json.title;
             result.Item.Overview = json.description;
 
-            var rxc = new Regex(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rxc.IsMatch(nameEx))
             {
                 MatchCollection match = rxc.Matches(nameEx);
@@ -243,7 +257,6 @@ namespace YTINFOReader.Helpers
             }
             else
             {
-                var rxp = new Regex(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                 if (rxp.IsMatch(nameEx))
                 {
                     MatchCollection match = rxp.Matches(nameEx);
