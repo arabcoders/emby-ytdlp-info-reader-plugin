@@ -134,8 +134,8 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = json.title;
-            result.Item.Overview = json.description;
+            result.Item.Name = json.title.Trim();
+            result.Item.Overview = json.description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
@@ -166,10 +166,10 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = string.IsNullOrEmpty(json.track) ? json.title : json.track;
+            result.Item.Name = string.IsNullOrEmpty(json.track) ? json.title.Trim() : json.track.Trim();
             result.Item.Artists = new List<string> { json.artist }.ToArray();
             result.Item.Album = json.album;
-            result.Item.Overview = json.description;
+            result.Item.Overview = json.description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
@@ -197,8 +197,8 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = json.title;
-            result.Item.Overview = json.description;
+            result.Item.Name = json.title.Trim();
+            result.Item.Overview = json.description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
@@ -247,8 +247,8 @@ namespace YTINFOReader.Helpers
 
             var identifier = json.channel_id;
             var nameEx = "[" + json.id + "]";
-            result.Item.Name = json.title;
-            result.Item.Overview = json.description;
+            result.Item.Name = json.title.Trim();
+            result.Item.Overview = json.description.Trim();
 
             if (rxc.IsMatch(nameEx))
             {
