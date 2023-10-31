@@ -147,7 +147,7 @@ namespace YTINFOReader.Helpers
             }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader, json.channel_id));
+            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
 
             return result;
@@ -178,7 +178,7 @@ namespace YTINFOReader.Helpers
             catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader, json.channel_id));
+            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
 
             return result;
@@ -207,7 +207,7 @@ namespace YTINFOReader.Helpers
             catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader, json.channel_id));
+            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
             result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd"));
             result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyy"));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
