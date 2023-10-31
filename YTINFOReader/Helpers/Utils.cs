@@ -21,6 +21,19 @@ namespace YTINFOReader.Helpers
 #nullable enable
         public static ILogger? Logger { get; set; }
 #nullable disable
+        /// <summary>
+        /// Regex for matching channel id.
+        /// </summary>
+        private static readonly Regex rxc = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        /// <summary>
+        /// Regex for matching playlist id.
+        /// </summary>
+        private static readonly Regex rxp = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        /// <summary>
+        /// Regex for matching video id.
+        /// </summary>
+        private static readonly Regex rx = new(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         public static bool IsFresh(FileSystemMetadata fileInfo)
         {
             if (fileInfo.Exists && DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc.UtcDateTime).Days <= 10)
@@ -37,27 +50,29 @@ namespace YTINFOReader.Helpers
         /// <returns></returns>
         public static string GetYTID(string name)
         {
-            var rxc = new Regex(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rxc.IsMatch(name))
             {
                 MatchCollection match = rxc.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
 
-            var rxp = new Regex(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rxp.IsMatch(name))
             {
                 MatchCollection match = rxp.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
 
-            var rx = new Regex(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rx.IsMatch(name))
             {
                 MatchCollection match = rx.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
             return "";
+        }
+
+        public static bool IsYouTubeContent(string name)
+        {
+            return GetYTID(name) != "";
         }
 
         /// <summary>
@@ -119,8 +134,8 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = json.title;
-            result.Item.Overview = json.description;
+            result.Item.Name = json.title.Trim();
+            result.Item.Overview = json.description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
@@ -132,7 +147,7 @@ namespace YTINFOReader.Helpers
             }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader, json.channel_id));
+            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
 
             return result;
@@ -151,10 +166,10 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = string.IsNullOrEmpty(json.track) ? json.title : json.track;
+            result.Item.Name = string.IsNullOrEmpty(json.track) ? json.title.Trim() : json.track.Trim();
             result.Item.Artists = new List<string> { json.artist }.ToArray();
             result.Item.Album = json.album;
-            result.Item.Overview = json.description;
+            result.Item.Overview = json.description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
@@ -163,7 +178,7 @@ namespace YTINFOReader.Helpers
             catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader, json.channel_id));
+            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
 
             return result;
@@ -182,8 +197,8 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = json.title;
-            result.Item.Overview = json.description;
+            result.Item.Name = json.title.Trim();
+            result.Item.Overview = json.description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
@@ -192,7 +207,7 @@ namespace YTINFOReader.Helpers
             catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader, json.channel_id));
+            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
             result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd"));
             result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyy"));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
@@ -232,10 +247,9 @@ namespace YTINFOReader.Helpers
 
             var identifier = json.channel_id;
             var nameEx = "[" + json.id + "]";
-            result.Item.Name = json.title;
-            result.Item.Overview = json.description;
+            result.Item.Name = json.title.Trim();
+            result.Item.Overview = json.description.Trim();
 
-            var rxc = new Regex(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             if (rxc.IsMatch(nameEx))
             {
                 MatchCollection match = rxc.Matches(nameEx);
@@ -243,7 +257,6 @@ namespace YTINFOReader.Helpers
             }
             else
             {
-                var rxp = new Regex(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                 if (rxp.IsMatch(nameEx))
                 {
                     MatchCollection match = rxp.Matches(nameEx);

@@ -46,10 +46,10 @@ namespace YTINFOReader.Provider
         /// <returns></returns>
         public bool HasChanged(BaseItem item, LibraryOptions LibraryOptions, IDirectoryService directoryService)
         {
-            _logger.Debug("YTLocal HasChanged: {Name}", item.Name);
+            _logger.Debug($"YTLocal HasChanged: {item.Name}");
             var infoJson = GetInfoJson(item.Path);
             var result = infoJson.Exists && _fileSystem.GetLastWriteTimeUtc(infoJson) < item.DateLastSaved;
-            _logger.Debug("YTLocal HasChanged Result: {Result}", result);
+            _logger.Debug($"YTLocal HasChanged Result: {result}");
             return result;
         }
 
@@ -62,7 +62,7 @@ namespace YTINFOReader.Provider
         /// <returns></returns>
         public Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
-            _logger.Debug("YTLocal GetMetadata: {Path}", info.Path);
+            _logger.Debug($"YTLocal GetMetadata: {info.Path}");
             var result = new MetadataResult<T>();
             var infoFile = Path.ChangeExtension(info.Path, "info.json");
             if (!File.Exists(infoFile))
@@ -70,7 +70,7 @@ namespace YTINFOReader.Provider
                 return Task.FromResult(result);
             }
             var jsonObj = Utils.ReadYTDLInfo(infoFile, directoryService.GetFile(info.Path), cancellationToken);
-            _logger.Debug("YTLocal GetMetadata Result: {JSON}", jsonObj.ToString());
+            _logger.Debug($"YTLocal GetMetadata Result: {jsonObj}");
             result = GetMetadataImpl(jsonObj);
 
             return Task.FromResult(result);
