@@ -10,11 +10,8 @@ namespace YTINFOReader
     public class VideoExternalId : IExternalId
     {
         public bool Supports(IHasProviderIds item) => item is Movie || item is Episode || item is MusicVideo;
-
         public string Name => Constants.PLUGIN_NAME;
-
         public string Key => Constants.PLUGIN_NAME;
-
         public string UrlFormatString => Constants.VIDEO_URL;
     }
 
@@ -31,11 +28,8 @@ namespace YTINFOReader
 
             return item is Series && isChannel;
         }
-
         public string Name => Constants.PLUGIN_NAME;
-
         public string Key => Constants.PLUGIN_NAME;
-
         public string UrlFormatString => Constants.CHANNEL_URL;
     }
 
@@ -53,9 +47,7 @@ namespace YTINFOReader
             return item is Series && isPlaylist;
         }
         public string Name => Constants.PLUGIN_NAME;
-
         public string Key => Constants.PLUGIN_NAME;
-
         public string UrlFormatString => Constants.PLAYLIST_URL;
     }
 
@@ -72,11 +64,8 @@ namespace YTINFOReader
 
             return item is Season && isPlaylist;
         }
-
         public string Name => Constants.PLUGIN_NAME;
-
         public string Key => Constants.PLUGIN_NAME;
-
         public string UrlFormatString => Constants.PLAYLIST_URL;
     }
 

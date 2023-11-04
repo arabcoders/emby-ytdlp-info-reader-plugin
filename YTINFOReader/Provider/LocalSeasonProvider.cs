@@ -21,8 +21,9 @@ namespace YTINFOReader.Provider
         }
         public Task<MetadataResult<Season>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
-            _logger.Info($"YTLocalSeason GetMetadata: {info.Path}");
-            MetadataResult<Season> result = new MetadataResult<Season>();
+            _logger.Info($"YIR Season GetMetadata: {info.Path}");
+            MetadataResult<Season> result = new();
+
             var item = new Season
             {
                 Name = Path.GetFileNameWithoutExtension(info.Path)
