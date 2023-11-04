@@ -45,7 +45,7 @@ namespace YTINFOReader.Provider
         /// <param name="item"></param>
         /// <param name="directoryService"></param>
         /// <returns></returns>
-        public bool HasChanged(BaseItem item, LibraryOptions LibraryOptions, IDirectoryService directoryService)
+        public virtual bool HasChanged(BaseItem item, LibraryOptions LibraryOptions, IDirectoryService directoryService)
         {
             _logger.Debug($"YIR HasChanged: {item.Name}");
             var infoJson = GetInfoJson(item.Path);
@@ -62,7 +62,7 @@ namespace YTINFOReader.Provider
         /// <param name="directoryService"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
+        public virtual Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
             _logger.Debug($"YIR GetMetadata: {info.Path}");
             var result = new MetadataResult<T>();

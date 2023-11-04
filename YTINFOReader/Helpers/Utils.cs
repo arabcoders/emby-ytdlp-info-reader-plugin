@@ -110,9 +110,9 @@ namespace YTINFOReader.Helpers
         /// <param name="metaFile"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static YTDLData ReadYTDLInfo(string fpath, FileSystemMetadata path, CancellationToken cancellationToken)
+        public static YTDLData ReadYTDLInfo(string fpath, FileSystemMetadata path, CancellationToken? cancellationToken = null)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            cancellationToken?.ThrowIfCancellationRequested();
             string jsonString = File.ReadAllText(fpath);
             YTDLData data = JsonSerializer.Deserialize<YTDLData>(jsonString, JSON_OPTS);
             data.File_path = path;
