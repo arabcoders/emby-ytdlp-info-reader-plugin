@@ -4,9 +4,7 @@ using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
 using Microsoft.Extensions.FileSystemGlobbing;
 using MediaBrowser.Model.Logging;
-using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using YTINFOReader.Helpers;
@@ -19,37 +17,32 @@ namespace YTINFOReader.Provider
         public string Name => Constants.PLUGIN_NAME;
         protected readonly ILogger _logger;
         protected readonly IFileSystem _fileSystem;
-
         public LocalSeriesProvider(IFileSystem fileSystem, ILogger logger)
         {
             _fileSystem = fileSystem;
             _logger = logger;
             Utils.Logger = logger;
         }
-
         private string GetSeriesInfo(string path)
         {
-            _logger.Debug($"YTLocalSeries GetSeriesInfo: {path}");
+            _logger.Debug($"YIR Series GetSeriesInfo: {path}");
             Matcher matcher = new();
             matcher.AddInclude("**/*.info.json");
-            Regex rxc = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            Regex rxp = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             string infoPath = "";
             foreach (string file in matcher.GetResultsInFullPath(path))
             {
-                if (rxc.IsMatch(file) || rxp.IsMatch(file))
+                if (Utils.RX_C.IsMatch(file) || Utils.RX_P.IsMatch(file))
                 {
                     infoPath = file;
                     break;
                 }
             }
-            _logger.Debug($"YTLocalSeries GetSeriesInfo Result: {infoPath}");
+            _logger.Debug($"YIR Series GetSeriesInfo Result: {infoPath}");
             return infoPath;
         }
-
         public Task<MetadataResult<Series>> GetMetadata(ItemInfo info, LibraryOptions LibraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
-            _logger.Debug($"YTLocalSeries GetMetadata: {info.Path}");
+            _logger.Debug($"YIR Series GetMetadata: {info.Path}");
             MetadataResult<Series> result = new();
             string infoPath = GetSeriesInfo(info.Path);
             if (string.IsNullOrEmpty(infoPath))
@@ -58,10 +51,9 @@ namespace YTINFOReader.Provider
             }
             var infoJson = Utils.ReadYTDLInfo(infoPath, directoryService.GetFile(info.Path), cancellationToken);
             result = Utils.YTDLJsonToSeries(infoJson);
-            _logger.Debug($"YTLocalSeries GetMetadata Result: {result}");
+            _logger.Debug($"YIR Series GetMetadata Result: {result}");
             return Task.FromResult(result);
         }
-
         FileSystemMetadata GetInfoJson(string path)
         {
             var fileInfo = _fileSystem.GetFileSystemInfo(path);
@@ -71,20 +63,20 @@ namespace YTINFOReader.Provider
             var file = _fileSystem.GetFileInfo(specificFile);
             return file;
         }
-
         public bool HasChanged(BaseItem item, LibraryOptions LibraryOptions, IDirectoryService directoryService)
         {
-            _logger.Debug($"YTLocalSeries HasChanged: {item.Path}");
+            _logger.Debug($"YIR Series HasChanged: {item.Path}");
             var infoPath = GetSeriesInfo(item.Path);
             var result = false;
             if (!string.IsNullOrEmpty(infoPath))
             {
                 var infoJson = GetInfoJson(infoPath);
-                result = infoJson.Exists && _fileSystem.GetLastWriteTimeUtc(infoJson) < item.DateLastSaved;
+                result = infoJson.Exists && infoJson.LastWriteTimeUtc.ToUniversalTime() < item.DateLastSaved.ToUniversalTime();
             }
-            _logger.Debug($"YTLocalSeries HasChanged Result: {result}");
-            return result;
+            string status = result ? "Changed" : "Not changed";
 
+            _logger.Debug($"YIR Series HasChanged Result: {status}");
+            return result;
         }
     }
 }

@@ -8,9 +8,7 @@
         public const string CHANNEL_RX = @"(?<=\[)(?:youtube-)?(?<id>(UC|HC)[a-zA-Z0-9\-_]{22})(?=\])";
         public const string VIDEO_URL = "https://www.youtube.com/watch?v={0}";
         public const string VIDEO_RX = @"(?<=\[)(?:youtube-)?(?<id>[a-zA-Z0-9\-_]{11})(?=\])";
-
-        public const string PLAYLIST_RX = @"\[(?:youtube\-)?(?<id>PL[^\[\]]{16}|PL[^\[\]]{32}|(UU|FL|LP|RD)[^\[\]]{22})\]";
-
+        public const string PLAYLIST_RX = @"\[(?:youtube\-)?(?<id>PL[^\[\]]{32}|PL[^\[\]]{16}|(UU|FL|LP|RD)[^\[\]]{22})\]";
         public const string PLAYLIST_URL = "https://www.youtube.com/playlist?list={0}";
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using MediaBrowser.Model.IO;
+using System.Text.Json;
 
 namespace YTINFOReader.Helpers
 {
@@ -9,20 +11,24 @@ namespace YTINFOReader.Helpers
     public class YTDLData
     {
         // direct object id be it either channel id or video id
-        public string id { get; set; }
-        public string uploader { get; set; }
-        public string upload_date { get; set; }
-        public string title { get; set; }
-        public string description { get; set; }
-        public string channel_id { get; set; }
-        public string track { get; set; }
-        public string artist { get; set; }
-        public string album { get; set; }
+        public string Id { get; set; }
+        public string Uploader { get; set; }
+        public string Upload_date { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Channel_id { get; set; }
+        public string Track { get; set; }
+        public string Artist { get; set; }
+        public string Album { get; set; }
 #nullable enable
         [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
-        public long? epoch { get; set; }
-        public MediaBrowser.Model.IO.FileSystemMetadata? file_path { get; set; }
+        public long? Epoch { get; set; }
+        public FileSystemMetadata? File_path { get; set; }
 #nullable disable
-        public List<ThumbnailInfo> thumbnails { get; set; }
+        public List<ThumbnailInfo> Thumbnails { get; set; }
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }

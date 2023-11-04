@@ -24,23 +24,28 @@ namespace YTINFOReader.Helpers
         /// <summary>
         /// Regex for matching channel id.
         /// </summary>
-        private static readonly Regex rxc = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex RX_C = new(Constants.CHANNEL_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         /// <summary>
         /// Regex for matching playlist id.
         /// </summary>
-        private static readonly Regex rxp = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex RX_P = new(Constants.PLAYLIST_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         /// <summary>
         /// Regex for matching video id.
         /// </summary>
-        private static readonly Regex rx = new(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex RX_V = new(Constants.VIDEO_RX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// JSON options for deserializing data.
+        /// </summary>
+        public static readonly JsonSerializerOptions JSON_OPTS = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString
+        };
 
         public static bool IsFresh(FileSystemMetadata fileInfo)
         {
-            if (fileInfo.Exists && DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc.UtcDateTime).Days <= 10)
-            {
-                return true;
-            }
-            return false;
+            return fileInfo.Exists && DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc.UtcDateTime).Days <= 10;
         }
 
         /// <summary>
@@ -50,31 +55,29 @@ namespace YTINFOReader.Helpers
         /// <returns></returns>
         public static string GetYTID(string name)
         {
-            if (rxc.IsMatch(name))
+            if (RX_C.IsMatch(name))
             {
-                MatchCollection match = rxc.Matches(name);
+                MatchCollection match = RX_C.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
 
-            if (rxp.IsMatch(name))
+            if (RX_P.IsMatch(name))
             {
-                MatchCollection match = rxp.Matches(name);
+                MatchCollection match = RX_P.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
 
-            if (rx.IsMatch(name))
+            if (RX_V.IsMatch(name))
             {
-                MatchCollection match = rx.Matches(name);
+                MatchCollection match = RX_V.Matches(name);
                 return match[0].Groups["id"].ToString();
             }
             return "";
         }
-
         public static bool IsYouTubeContent(string name)
         {
             return GetYTID(name) != "";
         }
-
         /// <summary>
         /// Creates a person object of type director for the provided name.
         /// </summary>
@@ -90,7 +93,6 @@ namespace YTINFOReader.Helpers
                 ProviderIds = new ProviderIdDictionary(new Dictionary<string, string> { { Constants.PLUGIN_NAME, channel_id } }),
             };
         }
-
         /// <summary>
         /// Returns path to where metadata json file should be.
         /// </summary>
@@ -102,7 +104,6 @@ namespace YTINFOReader.Helpers
             var dataPath = Path.Combine(appPaths.CachePath, Constants.PLUGIN_NAME, youtubeID);
             return Path.Combine(dataPath, "ytvideo.info.json");
         }
-
         /// <summary>
         /// Reads JSON data from file.
         /// </summary>
@@ -113,14 +114,10 @@ namespace YTINFOReader.Helpers
         {
             cancellationToken.ThrowIfCancellationRequested();
             string jsonString = File.ReadAllText(fpath);
-            YTDLData data = JsonSerializer.Deserialize<YTDLData>(jsonString, new JsonSerializerOptions
-            {
-                NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString
-            });
-            data.file_path = path;
+            YTDLData data = JsonSerializer.Deserialize<YTDLData>(jsonString, JSON_OPTS);
+            data.File_path = path;
             return data;
         }
-
         /// <summary>
         /// Provides a Movie Metadata Result from a json object.
         /// </summary>
@@ -134,12 +131,12 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = json.title.Trim();
-            result.Item.Overview = json.description.Trim();
+            result.Item.Name = json.Title.Trim();
+            result.Item.Overview = json.Description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
-                date = DateTime.ParseExact(json.upload_date, "yyyyMMdd", null);
+                date = DateTime.ParseExact(json.Upload_date, "yyyyMMdd", null);
             }
             catch
             {
@@ -147,12 +144,11 @@ namespace YTINFOReader.Helpers
             }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
-            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
+            result.AddPerson(CreatePerson(json.Uploader.Trim(), json.Channel_id));
+            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.Id);
 
             return result;
         }
-
         /// <summary>
         /// Provides a MusicVideo Metadata Result from a json object.
         /// </summary>
@@ -166,24 +162,23 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = string.IsNullOrEmpty(json.track) ? json.title.Trim() : json.track.Trim();
-            result.Item.Artists = new List<string> { json.artist }.ToArray();
-            result.Item.Album = json.album;
-            result.Item.Overview = json.description.Trim();
+            result.Item.Name = string.IsNullOrEmpty(json.Track) ? json.Title.Trim() : json.Track.Trim();
+            result.Item.Artists = new List<string> { json.Artist }.ToArray();
+            result.Item.Album = json.Album;
+            result.Item.Overview = json.Description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
-                date = DateTime.ParseExact(json.upload_date, "yyyyMMdd", null);
+                date = DateTime.ParseExact(json.Upload_date, "yyyyMMdd", null);
             }
             catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
-            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
+            result.AddPerson(CreatePerson(json.Uploader.Trim(), json.Channel_id));
+            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.Id);
 
             return result;
         }
-
         /// <summary>
         /// Provides a Episode Metadata Result from a json object.
         /// </summary>
@@ -197,36 +192,36 @@ namespace YTINFOReader.Helpers
                 HasMetadata = true,
                 Item = item
             };
-            result.Item.Name = json.title.Trim();
-            result.Item.Overview = json.description.Trim();
+            result.Item.Name = json.Title.Trim();
+            result.Item.Overview = json.Description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
             {
-                date = DateTime.ParseExact(json.upload_date, "yyyyMMdd", null);
+                date = DateTime.ParseExact(json.Upload_date, "yyyyMMdd", null);
             }
             catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
-            result.AddPerson(CreatePerson(json.uploader.Trim(), json.channel_id));
+            result.AddPerson(CreatePerson(json.Uploader.Trim(), json.Channel_id));
             result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd"));
             result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyy"));
-            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.id);
+            result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.Id);
 
-            if (json.epoch != null)
+            if (json.Epoch != null)
             {
-                Logger?.Debug($"Using epoch for episode index number for {json.id} {json.title}.");
-                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + DateTimeOffset.FromUnixTimeSeconds(json.epoch ?? new long()).ToString("mmss"));
+                Logger?.Debug($"Using epoch for episode index number for {json.Id} {json.Title}.");
+                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + DateTimeOffset.FromUnixTimeSeconds(json.Epoch ?? new long()).ToString("mmss"));
             }
 
-            if (json.epoch == null && json.file_path != null)
+            if (json.Epoch == null && json.File_path != null)
             {
-                Logger?.Debug($"Using file last write time for episode index number for {json.id} {json.title}.");
-                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.file_path.LastWriteTimeUtc.ToString("mmss"));
+                Logger?.Debug($"Using file last write time for episode index number for {json.Id} {json.Title}.");
+                result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd") + json.File_path.LastWriteTimeUtc.ToString("mmss"));
             }
 
-            if (json.file_path == null && json.epoch == null)
+            if (json.File_path == null && json.Epoch == null)
             {
-                Logger?.Error($"No file or epoch data found for {json.id} {json.title}.");
+                Logger?.Error($"No file or epoch data found for {json.Id} {json.Title}.");
             }
 
             return result;
@@ -245,21 +240,21 @@ namespace YTINFOReader.Helpers
                 Item = item
             };
 
-            var identifier = json.channel_id;
-            var nameEx = "[" + json.id + "]";
-            result.Item.Name = json.title.Trim();
-            result.Item.Overview = json.description.Trim();
+            var identifier = json.Channel_id;
+            var nameEx = "[" + json.Id + "]";
+            result.Item.Name = json.Title.Trim();
+            result.Item.Overview = json.Description.Trim();
 
-            if (rxc.IsMatch(nameEx))
+            if (RX_C.IsMatch(nameEx))
             {
-                MatchCollection match = rxc.Matches(nameEx);
+                MatchCollection match = RX_C.Matches(nameEx);
                 identifier = match[0].Groups["id"].ToString();
             }
             else
             {
-                if (rxp.IsMatch(nameEx))
+                if (RX_P.IsMatch(nameEx))
                 {
-                    MatchCollection match = rxp.Matches(nameEx);
+                    MatchCollection match = RX_P.Matches(nameEx);
                     identifier = match[0].Groups["id"].ToString();
                 }
             }
@@ -268,5 +263,4 @@ namespace YTINFOReader.Helpers
             return result;
         }
     }
-
 }

@@ -115,3 +115,4 @@ MediaBrowser.Plugins.Anime.userprefs
 
 # vscode
 .vscode/
+custom-deploy.sh
