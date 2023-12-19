@@ -18,10 +18,19 @@ namespace YTINFOReader.Provider
         public int Order => 0;
         private readonly ILogger _logger;
 
+        private readonly Matcher _matcher = new Matcher();
+
+        private readonly string[] _extensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".tiff", ".gif", ".jp2" };
+
         public LocalImageProvider(ILogger logger)
         {
             _logger = logger;
             Utils.Logger = logger;
+
+            foreach (var extension in _extensions)
+            {
+                _matcher.AddInclude($"**/*{extension}");
+            }
         }
 
         public bool Supports(BaseItem item) => item is Movie || item is Episode || item is MusicVideo || item is Series;
@@ -34,21 +43,21 @@ namespace YTINFOReader.Provider
         /// <returns></returns>
         public List<LocalImageInfo> GetImages(BaseItem item, LibraryOptions libraryOptions, IDirectoryService directoryService)
         {
-            var list = new List<LocalImageInfo>();
+            var list = new List<LocalImageInfo>(1);
 
             _logger.Debug($"YIR Image GetImages: {item.Name}");
 
             var imageFile = "";
-            var extensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".tiff", ".gif", ".jp2" };
+
+            if (string.IsNullOrEmpty(item.Path))
+            {
+                _logger.Debug($"YIR Image GetImages: {item.Name} - No path exists.");
+                return list;
+            }
 
             if (item is Series)
             {
-                Matcher matcher = new();
-                foreach (var extension in extensions)
-                {
-                    matcher.AddInclude($"**/*{extension}");
-                }
-                foreach (string file in matcher.GetResultsInFullPath(item.Path))
+                foreach (string file in _matcher.GetResultsInFullPath(item.Path))
                 {
                     if (Utils.RX_C.IsMatch(file) || Utils.RX_P.IsMatch(file))
                     {
@@ -59,10 +68,11 @@ namespace YTINFOReader.Provider
             }
             else
             {
-                foreach (var extension in extensions)
+                foreach (var extension in _extensions)
                 {
                     var path = Path.ChangeExtension(item.Path, extension);
-                    if (directoryService.GetFile(path).Exists)
+                    var file = directoryService.GetFile(path);
+                    if (null != file && file.Exists)
                     {
                         imageFile = path;
                         break;
