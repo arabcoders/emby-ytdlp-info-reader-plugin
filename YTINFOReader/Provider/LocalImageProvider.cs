@@ -37,7 +37,6 @@ namespace YTINFOReader.Provider
             var list = new List<LocalImageInfo>();
 
             _logger.Debug($"YIR Image GetImages: {item.Name}");
-            _logger.Debug($"YIR Item Contents: {item}");
 
             var imageFile = "";
             var extensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".tiff", ".gif", ".jp2" };
