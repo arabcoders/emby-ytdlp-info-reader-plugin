@@ -8,19 +8,22 @@ using YTINFOReader.Helpers;
 using System.IO;
 using MediaBrowser.Model.Entities;
 using Microsoft.Extensions.FileSystemGlobbing;
+using MediaBrowser.Model.Configuration;
 
 namespace YTINFOReader.Provider
 {
-    public class YTINFOReaderImageProvider : ILocalImageProvider, IHasOrder
+    public class LocalImageProvider : ILocalImageFileProvider, IHasOrder
     {
         public string Name => Constants.PLUGIN_NAME;
-        public int Order => 1;
+        public int Order => 0;
         private readonly ILogger _logger;
-        public YTINFOReaderImageProvider(ILogger logger)
+
+        public LocalImageProvider(ILogger logger)
         {
             _logger = logger;
             Utils.Logger = logger;
         }
+
         public bool Supports(BaseItem item) => item is Movie || item is Episode || item is MusicVideo || item is Series;
 
         /// <summary>
@@ -29,14 +32,15 @@ namespace YTINFOReader.Provider
         /// <param name="item"></param>
         /// <param name="directoryService"></param>
         /// <returns></returns>
-        public IEnumerable<LocalImageInfo> GetImages(BaseItem item, IDirectoryService directoryService)
+        public List<LocalImageInfo> GetImages(BaseItem item, LibraryOptions libraryOptions, IDirectoryService directoryService)
         {
             var list = new List<LocalImageInfo>();
 
             _logger.Debug($"YIR Image GetImages: {item.Name}");
+            _logger.Debug($"YIR Item Contents: {item}");
 
             var imageFile = "";
-            var extensions = new[] { ".jpg", ".png", ".webp" };
+            var extensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".tiff", ".gif", ".jp2" };
 
             if (item is Series)
             {
@@ -69,6 +73,7 @@ namespace YTINFOReader.Provider
 
             if (string.IsNullOrEmpty(imageFile))
             {
+                _logger.Debug($"YIR Image GetImages: {item.Name} - No image found for {item.Path}");
                 return list;
             }
 
