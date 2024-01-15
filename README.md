@@ -16,6 +16,7 @@ The reason we prefix the episode numbers by `1` is because we use two month digi
  the plugin fallback on file last modification time.
 
 ## Overview
+
 Plugin for [Emby](https://emby.media/) that retrieves metadata for content from yt-dlp `.info.json` files.
 
 ### Features
@@ -44,6 +45,12 @@ For Video files it follow the same rules as the channel format.
 - `whatever [(youtube-)?dQw4w9WgXcQ].(jpg|png|webp)`
 - `whatever [(youtube-)?dQw4w9WgXcQ].mkv`
 
+# Installation
+
+Go to the Releases page and download the latest release.
+
+Unzip the file and copy `YTINFOReader.dll` to Emby plugins directory and restart Emby. 
+
 ## Build and Installing from source
 
 1. Clone or download this repository.
@@ -54,4 +61,9 @@ For Video files it follow the same rules as the channel format.
     ```
 4. Copy `YTINFOReader.dll` from the `bin` directory to emby plugins directory.
 5. Restart emby
-6. If performed correctly you will see a plugin named YTINFOReader in `Dashboard -> Plugins`.
+
+If performed correctly you will see a plugin named YTINFOReader in `Dashboard -> Plugins`.
+
+-----------------
+
+Go to your YouTube library make sure `YTINFOReader` is on the top of your `Metadata readers` list. Disable all external metadata sources. And only enable `Image fetchers (Episodes):` - `Screen grabber (FFmpeg)`. if you don't have a local image for the episode, it will be fetched from the video file itself.
