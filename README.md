@@ -1,5 +1,8 @@
 # YouTube INFO reader plugin
 
+![Build Status](https://github.com/ArabCoders/emby-ytdlp-info-reader-plugin/actions/workflows/build-validation.yml/badge.svg)
+![License](https://img.shields.io/github/license/ArabCoders/emby-ytdlp-info-reader-plugin.svg)
+
 This project based on Ankenyr [jellyfin-youtube-metadata-plugin](https://github.com/ankenyr/jellyfin-youtube-metadata-plugin), I removed the remote support
 and added what we think make sense for episodes numbers, if you follow active channels like we do, you will notice that
 some episodes will have problems in sorting or numbering, we fixed some issues that relates to what we need.
