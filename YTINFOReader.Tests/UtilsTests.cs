@@ -109,9 +109,26 @@ namespace YTINFOReader.Tests
             Assert.Equal(2009, result.Item.ProductionYear);
             Assert.Equal("20091025", (result.Item.PremiereDate ?? DateTime.Now).ToString("yyyyMMdd"));
             Assert.Equal("Rick Astley", result.People[0].Name);
+            Assert.Equal("Rick Astley Tester", result.Item.Artists[0]);
             Assert.Equal("UCuAXFkgsw1L7xaCfnd5JJOw", result.People[0].ProviderIds[Constants.PLUGIN_NAME]);
             Assert.Equal("dQw4w9WgXcQ", result.Item.ProviderIds[Constants.PLUGIN_NAME]);
         }
+
+        [Fact]
+        public void YTDLJsonToMusicTestWithOutMusicData()
+        {
+            var result = Utils.YTDLJsonToMusicVideo(GetYTMusicWithoutMusicData());
+            Assert.True(result.HasMetadata);
+            Assert.Equal("Never Gonna Give You Up", result.Item.Name);
+            Assert.Equal("Rick Astley Test", result.Item.Artists[0]);
+            Assert.Equal("The official video for “Never Gonna Give You Up” by Rick Astley", result.Item.Overview);
+            Assert.Equal(2009, result.Item.ProductionYear);
+            Assert.Equal("20091025", (result.Item.PremiereDate ?? DateTime.Now).ToString("yyyyMMdd"));
+            Assert.Equal("Rick Astley", result.People[0].Name);
+            Assert.Equal("UCuAXFkgsw1L7xaCfnd5JJOw", result.People[0].ProviderIds[Constants.PLUGIN_NAME]);
+            Assert.Equal("dQw4w9WgXcQ", result.Item.ProviderIds[Constants.PLUGIN_NAME]);
+        }
+
         [Fact]
         public void YTDLJsonToEpisodeTest()
         {
@@ -139,12 +156,19 @@ namespace YTINFOReader.Tests
         }
         public static YTDLData GetYouTubeVideoData()
         {
-            string jsonString = "{\"id\":\"dQw4w9WgXcQ\",\"uploader\":\"Rick Astley\",\"upload_date\":\"20091025\",\"title\":\"Never Gonna Give You Up\",\"description\":\"The official video for “Never Gonna Give You Up” by Rick Astley\",\"channel_id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"track\":\"Music\",\"artist\":\"Rick Astley\",\"album\":null,\"epoch\":1673637911,\"file_path\":null,\"thumbnails\":null}";
+            string jsonString = "{\"id\":\"dQw4w9WgXcQ\",\"uploader\":\"Rick Astley\",\"channel\":\"Rick Astley\",\"upload_date\":\"20091025\",\"title\":\"Never Gonna Give You Up\",\"description\":\"The official video for “Never Gonna Give You Up” by Rick Astley\",\"channel_id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"track\":\"Music\",\"artist\":\"Rick Astley Tester\",\"album\":null,\"epoch\":1673637911,\"file_path\":null,\"thumbnails\":null}";
             return JsonSerializer.Deserialize<YTDLData>(jsonString, Utils.JSON_OPTS) ?? new YTDLData();
         }
+
+        public static YTDLData GetYTMusicWithoutMusicData()
+        {
+            string jsonString = "{\"id\":\"dQw4w9WgXcQ\",\"uploader\":\"Rick Astley\",\"channel\":\"Rick Astley Test\",\"upload_date\":\"20091025\",\"title\":\"Never Gonna Give You Up\",\"description\":\"The official video for “Never Gonna Give You Up” by Rick Astley\",\"channel_id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"epoch\":1673637911,\"file_path\":null,\"thumbnails\":null}";
+            return JsonSerializer.Deserialize<YTDLData>(jsonString, Utils.JSON_OPTS) ?? new YTDLData();
+        }
+
         public static YTDLData GetYouTubeChannelData()
         {
-            string jsonString = "{\"id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"uploader\":\"Rick Astley\",\"upload_date\":null,\"title\":\"Rick Astley\",\"description\":\"Official YouTube channel for Rick Astley.\",\"channel_id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"track\":null,\"artist\":null,\"album\":null,\"epoch\":1673637911,\"file_path\":null,\"thumbnails\":null}";
+            string jsonString = "{\"id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"uploader\":\"Rick Astley\",\"channel\":\"Rick Astley\",\"upload_date\":null,\"title\":\"Rick Astley\",\"description\":\"Official YouTube channel for Rick Astley.\",\"channel_id\":\"UCuAXFkgsw1L7xaCfnd5JJOw\",\"track\":null,\"artist\":null,\"album\":null,\"epoch\":1673637911,\"file_path\":null,\"thumbnails\":null}";
             return JsonSerializer.Deserialize<YTDLData>(jsonString, Utils.JSON_OPTS) ?? new YTDLData();
         }
     }

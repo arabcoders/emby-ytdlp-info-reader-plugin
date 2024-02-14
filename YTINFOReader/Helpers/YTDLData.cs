@@ -12,6 +12,7 @@ namespace YTINFOReader.Helpers
     {
         // direct object id be it either channel id or video id
         public string Id { get; set; }
+        public string Channel { get; set; }
         public string Uploader { get; set; }
         public string Upload_date { get; set; }
         public string Title { get; set; }
