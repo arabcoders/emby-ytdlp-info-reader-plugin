@@ -138,10 +138,7 @@ namespace YTINFOReader.Helpers
             {
                 date = DateTime.ParseExact(json.Upload_date, "yyyyMMdd", null);
             }
-            catch
-            {
-
-            }
+            catch { }
             result.Item.ProductionYear = date.Year;
             result.Item.PremiereDate = date;
             result.AddPerson(CreatePerson(json.Uploader.Trim(), json.Channel_id));
@@ -163,8 +160,17 @@ namespace YTINFOReader.Helpers
                 Item = item
             };
             result.Item.Name = string.IsNullOrEmpty(json.Track) ? json.Title.Trim() : json.Track.Trim();
-            result.Item.Artists = new List<string> { json.Artist }.ToArray();
-            result.Item.Album = json.Album;
+            result.Item.Artists = new List<string> { !string.IsNullOrEmpty(json.Artist) ? json.Artist : json.Channel }.ToArray();
+            if (!string.IsNullOrEmpty(json.Album))
+            {
+                result.Item.Album = json.Album;
+            }
+
+            if (!string.IsNullOrEmpty(json.Track))
+            {
+                result.Item.Name = json.Track;
+            }
+
             result.Item.Overview = json.Description.Trim();
             var date = new DateTime(1970, 1, 1);
             try
@@ -227,7 +233,7 @@ namespace YTINFOReader.Helpers
             return result;
         }
         /// <summary>
-        /// Provides a MusicVideo Metadata Result from a json object.
+        /// Provides a Series Metadata Result from a json object.
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
