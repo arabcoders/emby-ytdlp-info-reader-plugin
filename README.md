@@ -48,6 +48,61 @@ For Video files it follow the same rules as the channel format.
 - `whatever [(youtube-)?dQw4w9WgXcQ].(jpg|png|webp)`
 - `whatever [(youtube-)?dQw4w9WgXcQ].mkv`
 
+So, the file naming should be similar to this let the playlist id be this `PLvFQJa1XAXzywRlnEwZudye-tyFNkcC40` and video id be `C-d70junWwX`.
+```
+/media/youtube/
+├─My cool playlist [PLvFQJa1XAXzywRlnEwZudye-tyFNkcC40]/
+├── My cool playlist [PLvFQJa1XAXzywRlnEwZudye-tyFNkcC40].info.json
+├── My cool playlist [PLvFQJa1XAXzywRlnEwZudye-tyFNkcC40].jpg
+└── Season 2024
+    ├── 20240108 - My video title [youtube-C-d70junWwX].info.json
+    ├── 20240108 - My video title [youtube-C-d70junWwX].jpg
+    ├── 20240108 - My video title [youtube-C-d70junWwX].mkv
+```
+
+A good yt-dlp config is the following
+
+```bash
+--continue
+
+# Windows compatiable filenames.
+--windows-filenames
+
+# Embed metadata.
+--embed-metadata
+
+# Format Naming
+--output '%(playlist,channel)s [%(playlist_id,channel_id)s]/Season %(release_date>%Y,upload_date>%Y|Unknown)s/%(release_date>%Y%m%d,upload_date>%Y%m%d)s - %(title).180B [%(id)s].%(ext)s'
+
+# Download History
+--download-archive ~/.config/yt-dlp/archive.log
+
+# For Dash/hls downloads
+--concurrent-fragments 10
+
+# Output container.
+--merge-output-format mkv
+
+# Set home path
+--paths "home:/media/youtube/"
+
+# Set temp path
+--paths "temp:/tmp"
+
+# Best format.
+-f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+
+# Limit to x264.
+-S "vcodec:h264"
+
+# Subs stuff.
+--convert-subs srt --embed-subs --sub-langs "en"
+
+# Run mkvpropedit
+# You may want to disable this if you don't have mkvpropedit installed. or don't want mkv as container format.
+--exec "after_move:mkvpropedit --add-track-statistics-tags %(filepath)q"
+```
+
 # Installation
 
 Go to the Releases page and download the latest release.
