@@ -210,7 +210,7 @@ namespace YTINFOReader.Helpers
             result.Item.PremiereDate = date;
             result.AddPerson(CreatePerson(json.Uploader.Trim(), json.Channel_id));
             result.Item.IndexNumber = int.Parse("1" + date.ToString("MMdd"));
-            result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyy"));
+            result.Item.ParentIndexNumber = int.Parse(date.ToString("yyyyMM"));
             result.Item.ProviderIds.Add(Constants.PLUGIN_NAME, json.Id);
 
             if (json.Epoch != null)
