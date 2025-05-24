@@ -1,33 +1,48 @@
 name: Build
-
 on:
   push:
     tags:
       - "*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
 
 env:
   DOTNET_VERSION: "6.0.x"
+  PACKAGE_NAME: "YTINFOReader"
 
 jobs:
   Tests:
     uses: ./.github/workflows/tests.yml
+
   publish:
     needs: Tests
     name: build_package
+    permissions:
+      packages: write
+      contents: write
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: restore cached dependencies
-        uses: actions/cache@v2
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
@@ -37,28 +52,32 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build YTINFOReader --configuration Release --no-restore
+        run: dotnet build ${{ env.PACKAGE_NAME }} --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish YTINFOReader --configuration Release --no-restore --output bin
+        run: dotnet publish ${{ env.PACKAGE_NAME }} --configuration Release --no-restore --output bin
 
       - name: Package
         id: create_package
         shell: bash
         run: |
           tag=$(git describe --tags --always)
-          release_name="YTINFOReader-${tag}"
+          release_name="${{ env.PACKAGE_NAME }}-${tag}"
 
           # Pack files
-          7z a -tzip "${release_name}.zip" "./bin/YTINFOReader.dll"
-          echo "::set-output name=release_name::${release_name}"
-          echo "::set-output name=release_tag::${tag}"
-          echo "::set-output name=filename::${release_name}.zip"
+          7z a -tzip "${release_name}.zip" "./bin/${{ env.PACKAGE_NAME }}.dll"
+
+          # Set outputs using environment file
+          {
+            echo "release_name=${release_name}"
+            echo "release_tag=${tag}"
+            echo "filename=${release_name}.zip"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          repo_token: "${{ secrets.GH_TOKEN }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
           title: "${{ steps.create_package.outputs.release_tag }}"
           automatic_release_tag: "${{ steps.create_package.outputs.release_tag }}"
           prerelease: true

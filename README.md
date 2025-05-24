@@ -7,22 +7,18 @@ This project based on Ankenyr [jellyfin-youtube-metadata-plugin](https://github.
 and added what we think make sense for episodes numbers, if you follow active channels like we do, you will notice that
 some episodes will have problems in sorting or numbering, we fixed some issues that relates to what we need.
 
-Episodes are named `1` + `MMddhhmm`, for example if the episode date is `2022-06-01 05:33:44` the episode Index number should be
-`106010533` this should sort active channels match better. we wanted to add seconds to the Index number, but sadly due to the limitation
-of int32 we are unable to do so. And for seasons, it should reflect the year and in this example it would be `2022`.
+Episodes are named `1` + `MMdd`, plus four integers `XXXX` generated using algo to be consistent across all platforms and you will get
+the same episode number.
 
-The reason we prefix the episode numbers by `1` is because we use two month digit, thus if you have episodes that aired `2023-07-02 00:00:00` and `2023-10-02 00:00:00`,
- it will prevent the `10-02` episode from appearing before the `07-02` episodes. Usually `0` is not counted in the index so if we do not add `1` before the
- index number the episodes index will be `70020000` vs `10020000`.
+The reason we prefix the episode numbers by `1` is because we use two month digit, thus if you have episodes that aired `2023-07-02` and `2023-10-02`,
+it will prevent the `10-02` episode from appearing before the `07-02` episodes. Usually `0` is not counted in the index so if we do not add `1` before the
+index number the episodes index will be `70020000` vs `10020000`.
 
- The hours and minutes are pulled from the `epoch` field in the JSON file, if the `.info.json` file is very old and does not have the variable,
- the plugin fallback on file last modification time.
-
-## Overview
+# Overview
 
 Plugin for [Emby](https://emby.media/) that retrieves metadata for content from yt-dlp `.info.json` files.
 
-### Features
+## Features
 - Reads the `.info.json` files provided by [yt-dlp](https://github.com/yt-dlp/yt-dlp) or similar programs to extract metadata from.
 - Supports thumbnails of `png`, `jpg` or `webp` format for both channel and videos.
 - Supports the following library types `Movies`, `Music Videos` and `Shows`.
@@ -65,7 +61,7 @@ A good yt-dlp config is the following
 ```bash
 --continue
 
-# Windows compatiable filenames.
+# Windows compatible filenames.
 --windows-filenames
 
 # Embed metadata.
@@ -103,11 +99,13 @@ A good yt-dlp config is the following
 --exec "after_move:mkvpropedit --add-track-statistics-tags %(filepath)q"
 ```
 
+Or use [YTPTube](https://github.com/arabcoders/ytptube) which has a preset already made to work with this plugin.
+
 # Installation
 
 Go to the Releases page and download the latest release.
 
-Unzip the file and copy `YTINFOReader.dll` to Emby plugins directory and restart Emby. 
+Unzip the file and copy `YTINFOReader.dll` to Emby plugins directory and restart Emby.
 
 ## Build and Installing from source
 
