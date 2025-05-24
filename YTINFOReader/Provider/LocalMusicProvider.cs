@@ -4,15 +4,15 @@ using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Logging;
 using YTINFOReader.Helpers;
 
-namespace YTINFOReader.Provider
+namespace YTINFOReader.Provider;
+
+public class LocalMusicProvider : AbstractLocalProvider<LocalMusicProvider, MusicVideo>
 {
-    public class LocalMusicProvider : AbstractLocalProvider<LocalMusicProvider, MusicVideo>
+    public override string Name => Constants.PLUGIN_NAME;
+    public LocalMusicProvider(IFileSystem fileSystem, ILogger logger) : base(fileSystem, logger) { }
+
+    internal override MetadataResult<MusicVideo> GetMetadataImpl(YTDLData jsonObj)
     {
-        public override string Name => Constants.PLUGIN_NAME;
-        public LocalMusicProvider(IFileSystem fileSystem, ILogger logger) : base(fileSystem, logger) { }
-        internal override MetadataResult<MusicVideo> GetMetadataImpl(YTDLData jsonObj)
-        {
-            return Utils.YTDLJsonToMusicVideo(jsonObj);
-        }
+        return Utils.YTDLJsonToMusicVideo(jsonObj);
     }
 }
