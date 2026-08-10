@@ -1,3 +1,5 @@
+
+
 # YouTube INFO reader plugin
 
 ![Build Status](https://github.com/ArabCoders/emby-ytdlp-info-reader-plugin/actions/workflows/build-validation.yml/badge.svg)
@@ -113,7 +115,7 @@ Unzip the file and copy `YTINFOReader.dll` to Emby plugins directory and restart
 2. Ensure you have .NET Core SDK setup and installed.
 3. Build plugin with following command.
     ```
-    dotnet publish --configuration Release --output bin
+    dotnet publish YTINFOReader --configuration Release --output bin
     ```
 4. Copy `YTINFOReader.dll` from the `bin` directory to emby plugins directory.
 5. Restart emby
